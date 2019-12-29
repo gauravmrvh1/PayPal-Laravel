@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Exception;
 use PayPal\Api\ChargeModel;
 use PayPal\Api\Currency;
 use PayPal\Api\MerchantPreferences;
@@ -13,6 +13,8 @@ use PayPal\Api\Plan;
 use PayPal\Api\Patch;
 use PayPal\Api\PatchRequest;
 use PayPal\Common\PayPalModel;
+use PayPal\Api\Agreement;
+
 
 class PlanController extends Controller
 {
@@ -24,14 +26,14 @@ class PlanController extends Controller
     public function __construct(){
         $this->apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
-                'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
-                'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
+                env('PAYPAL_CLIENT_ID', ''),            // ClientID
+                env('PAYPAL_CLIENT_SECRET', '')         // ClientSecret
             )
         );
     }
 
     /**
-     * 
+     * @desc: Payment definitions for this billing plan
      */
     public function createPlan( Request $request ){
         // ======================================Create Plan Functionality========================================
@@ -88,10 +90,13 @@ class PlanController extends Controller
     }
 
     /**
-     * 
+     * @name : PlanDetail
      */
-    public function getPlans(){
-        $planId = 'P-96689664189973931IJGZFPA';
+    public function getPlanDetail($planId){
+        if( empty($planId) ){
+            $planId = 'P-96689664189973931IJGZFPA';
+        }
+
         try {
             $plan = Plan::get($planId, $this->apiContext);
             echo '<pre>';
@@ -103,16 +108,33 @@ class PlanController extends Controller
     }
 
     /**
-     * 
+     * @desc: Get List of Plan
      */
-    public function updatePlan()
+    public function getPlanList(Request $request){
+        try{
+            $params = array('page_size' => '10');
+            $planList = Plan::all($params, $this->apiContext);
+            echo '<pre>';
+            return $planList;
+
+        } catch (Exception $ex) {
+            
+        }
+    }
+
+    /**
+     * @desc: Update a plan
+     */
+    public function updatePlan(Request $request)
     {
         # code...
         try {
+            $planId = 'P-7RH89600HA168153XIYYTNRI';
+            $createdPlan = $this->getPlanDetail($planId);
+            // return $createdPlan;
             $patch = new Patch();
-        
             $value = new PayPalModel('{
-                "state":"ACTIVE"
+                "description":"Description"
                 }'
             );
         
@@ -122,12 +144,38 @@ class PlanController extends Controller
 
             $patchRequest = new PatchRequest();
             $patchRequest->addPatch($patch);
+
+            // echo '<pre>';
+            // echo $patchRequest;
+            // die;
         
-            $createdPlan->update($patchRequest, $apiContext);
-        
-            $plan = Plan::get($createdPlan->getId(), $apiContext);
+            $createdPlan->update($patchRequest, $this->apiContext);
+            $plan = Plan::get($planId, $this->apiContext);
+
+            return $plan;
+
         } catch (Exception $ex) {
 
         }
+    }
+
+    /**
+     * @desc: Delete Plan
+     */
+    public function deletePlan(Request $request){
+        $planId = $request->id;
+        $createdPlan = $this->getPlanDetail($planId);
+
+        try {
+            $result = $createdPlan->delete($this->apiContext);
+
+        } catch (Exception $ex) {
+
+        }
+
+        echo '<pre>';
+        echo $result;
+        die;
+
     }
 }

@@ -23,4 +23,8 @@ Route::get('/paypal/ExecutePayment',['uses' => 'PaypalController@create', 'as' =
 
 // Plans Routes
 Route::get('/paypal/CreatePlan',['uses' => 'PlanController@createPlan', 'as' => 'paypal.CreatePlan']);
-Route::get('/paypal/PlanList',['uses' => 'PlanController@getPlans', 'as' => 'paypal.PlanList']);
+Route::get('/paypal/UpdatePlan',['uses' => 'PlanController@updatePlan', 'as' => 'paypal.UpdatePlan']);
+Route::get('/paypal/DeletePlan/{id?}',['uses' => 'PlanController@deletePlan', 'as' => 'paypal.DeletePlan']);
+
+Route::get('/paypal/PlanDetail/{id}',['uses' => 'PlanController@getPlan', 'as' => 'paypal.PlanDetail']);
+Route::get('/paypal/PlanList',['uses' => 'PlanController@getPlanList', 'as' => 'paypal.PlanList']);

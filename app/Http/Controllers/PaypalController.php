@@ -27,8 +27,8 @@ class PaypalController extends Controller
     public function __construct(){
         $this->apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
-                'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
-                'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
+                env('PAYPAL_CLIENT_ID', ''),            // ClientID
+                env('PAYPAL_CLIENT_SECRET', '')         // ClientSecret
             )
         );
     }
@@ -43,19 +43,19 @@ class PaypalController extends Controller
         // dd('paypal');
         // dd( env('PAYPAL_SANDBOX_API_USERNAME', '') );
 
-        $apiContext = new \PayPal\Rest\ApiContext(
-            new \PayPal\Auth\OAuthTokenCredential(
-                'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
-                'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
-            )
-        );
+        // $apiContext = new \PayPal\Rest\ApiContext(
+        //     new \PayPal\Auth\OAuthTokenCredential(
+        //         'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
+        //         'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
+        //     )
+        // );
 
-        /* $apiContext = new \PayPal\Rest\ApiContext(
+        $apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
                 'AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS',     // ClientID
                 'EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL'      // ClientSecret
             )
-        ); */
+        );
 
         $payer = new \PayPal\Api\Payer();
         $payer->setPaymentMethod('paypal');
@@ -63,13 +63,14 @@ class PaypalController extends Controller
         
         $item1 = new Item();
         $item1->setName('Ground Coffee 40 oz')
-            ->setCurrency('INR')
+            ->setCurrency('USD')
             ->setQuantity(1)
             ->setSku("123123") // Similar to `item_number` in Classic API
             ->setPrice(7.5);
-            $item2 = new Item();
-            $item2->setName('Granola bars')
-            ->setCurrency('INR')
+
+        $item2 = new Item();
+        $item2->setName('Granola bars')
+            ->setCurrency('USD')
             ->setQuantity(5)
             ->setSku("321321") // Similar to `item_number` in Classic API
             ->setPrice(2);
@@ -87,13 +88,13 @@ class PaypalController extends Controller
 
 
         $amount = new Amount();
-        $amount->setCurrency("INR")
+        $amount->setCurrency("USD")
             ->setTotal(20)
             ->setDetails($details);
 
         // $amount = new \PayPal\Api\Amount();
         // $amount->setTotal('1.00');
-        // $amount->setCurrency('INR');
+        // $amount->setCurrency('USD');
         // dd( $amount );
 
 
@@ -254,5 +255,31 @@ class PaypalController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * @name: retreivePayment
+     */
+    public function retreivePayment(){
+        $paymentId = null;
+        try {
+            $payment = Payment::get($createdPayment->getId(), $this->apiContext);
+        } catch (Exception $ex) {
+
+        }
+        return $payment;
+    }
+
+    /**
+     * @name : getPaymentList
+     */
+    public function getPaymentList(){
+        try {
+            $params = array('count' => 10, 'start_index' => 5);
+            $payments = Payment::all($params, $apiContext);
+
+        } catch (Exception $ex) {
+
+        }
     }
 }
