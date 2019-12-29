@@ -43,19 +43,19 @@ class PaypalController extends Controller
         // dd('paypal');
         // dd( env('PAYPAL_SANDBOX_API_USERNAME', '') );
 
-        // $apiContext = new \PayPal\Rest\ApiContext(
-        //     new \PayPal\Auth\OAuthTokenCredential(
-        //         'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
-        //         'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
-        //     )
-        // );
-
         $apiContext = new \PayPal\Rest\ApiContext(
+            new \PayPal\Auth\OAuthTokenCredential(
+                'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
+                'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
+            )
+        );
+
+        /* $apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
                 'AYSq3RDGsmBLJE-otTkBtM-jBRd1TCQwFf9RGfwddNXWz0uFU9ztymylOhRS',     // ClientID
                 'EGnHDxD_qRPdaLdZz8iCr8N7_MzF-YHPTkjs6NKYQvQSBngp4PTTVWkPZRbL'      // ClientSecret
             )
-        );
+        ); */
 
         $payer = new \PayPal\Api\Payer();
         $payer->setPaymentMethod('paypal');
