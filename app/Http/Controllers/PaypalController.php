@@ -27,8 +27,10 @@ class PaypalController extends Controller
     public function __construct(){
         $this->apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
-                env('PAYPAL_CLIENT_ID', ''),            // ClientID
-                env('PAYPAL_CLIENT_SECRET', '')         // ClientSecret
+                env('PAYPAL_CLIENT_ID', '')            // ClientID
+                ,env('PAYPAL_CLIENT_SECRET', '')         // ClientSecret
+                // env('PAYPAL_CLIENT_ID_OTHER', '')            // ClientID
+                // ,env('PAYPAL_CLIENT_SECRET_OTHER', '')         // ClientSecret
             )
         );
     }
@@ -43,12 +45,12 @@ class PaypalController extends Controller
         // dd('paypal');
         // dd( env('PAYPAL_SANDBOX_API_USERNAME', '') );
 
-        $apiContext = new \PayPal\Rest\ApiContext(
+        /* $apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
                 'Aa0pTYPREBpQcuKR9lWyHEg_vv9xxLlnk9GTQkB0eTGU04hscEjiolVpeoTBkFLZaJ6ceXnqvJcNEXCn',     // ClientID
                 'EHxv7kPEtaiPZPsnh_h33jnFm-1zIbTsqdepQwd5874mAeILcoexsciquUpnkBDRVQFDl13J2eQGMi-U'      // ClientSecret
             )
-        );
+        ); */
 
         /* $apiContext = new \PayPal\Rest\ApiContext(
             new \PayPal\Auth\OAuthTokenCredential(
@@ -63,14 +65,14 @@ class PaypalController extends Controller
         
         $item1 = new Item();
         $item1->setName('Ground Coffee 40 oz')
-            ->setCurrency('USD')
+            ->setCurrency('INR')
             ->setQuantity(1)
             ->setSku("123123") // Similar to `item_number` in Classic API
             ->setPrice(7.5);
 
         $item2 = new Item();
         $item2->setName('Granola bars')
-            ->setCurrency('USD')
+            ->setCurrency('INR')
             ->setQuantity(5)
             ->setSku("321321") // Similar to `item_number` in Classic API
             ->setPrice(2);
@@ -88,13 +90,13 @@ class PaypalController extends Controller
 
 
         $amount = new Amount();
-        $amount->setCurrency("USD")
+        $amount->setCurrency("INR")
             ->setTotal(20)
             ->setDetails($details);
 
         // $amount = new \PayPal\Api\Amount();
         // $amount->setTotal('1.00');
-        // $amount->setCurrency('USD');
+        // $amount->setCurrency('INR');
         // dd( $amount );
 
 
@@ -142,7 +144,7 @@ class PaypalController extends Controller
                     array(
                         "amount" => array(
                             "total" => "1.00",
-                            "currency" => "USD"
+                            "currency" => "INR"
                         )
                     )
                 )
@@ -155,7 +157,9 @@ class PaypalController extends Controller
         // After Step 3
         try {
 
-            $payment->create($apiContext);
+            // dd($this->apiContext);
+            // $payment->create($apiContext);
+            $payment->create($this->apiContext);
             $approvalUrl = $payment->getApprovalLink();
 
             return redirect()->away($approvalUrl);
@@ -172,14 +176,16 @@ class PaypalController extends Controller
             //REALLY HELPFUL FOR DEBUGGING
 
             echo '<pre>';
-            // echo $ex->getCode(); // Prints the Error Code
-            echo $ex->getData(); // Prints the detailed error message 
+            echo 'Error Code'.$ex->getCode(); // Prints the Error Code
+            echo 'Error Message'.$ex->getData(); // Prints the detailed error message 
             die;
-            die($ex);
         } 
         
         catch (Exception $ex) {
-            die($ex);
+            echo '<pre>';
+            echo 'Error Code'.$ex->getCode(); // Prints the Error Code
+            echo 'Error Message'.$ex->getData(); // Prints the detailed error message 
+            die;
         }
 
     }
